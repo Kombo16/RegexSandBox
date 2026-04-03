@@ -4,13 +4,12 @@
   //3. test-string variable
   //4. button variable
   //5. result variable
-const regexPattern = document.getElementById(".pattern");
+const regexPattern = document.getElementById("pattern");
 const stringToTest = document.getElementById("test-string");
 const testButton = document.getElementById("test-btn");
 const testResult = document.getElementById("result");
 const caseInsensitiveFlag = document.getElementById("i");
 const globalFlag = document.getElementById("g");
-const flags = document.getElementsByName('flags');
 const flagsContainer = document.getElementById("flags-container");
 /*Functions */
 
