@@ -55,6 +55,10 @@ regexPattern.addEventListener("input",()=>{
     regExp = RegExp(regexPattern.value, getFlags());
     console.log(regExp);
 })
+flagsContainer.addEventListener("change",()=>{
+    regExp = RegExp(regexPattern.value, getFlags());
+    console.log(regExp);
+})
 testButton.addEventListener("click", ()=>{
     if (stringToTest.textContent == "") {
         testResult.textContent = "Nothing to test";
