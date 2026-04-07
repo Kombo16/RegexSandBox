@@ -40,13 +40,16 @@ and prints output
   output: returns values gotten to result.textContent else return no match
 */
 function testString(string, regex){
-    if (regex.test(string) && globalFlag.checked){
-        return string.matchAll(regExp)[0];
-    }
-    else if (!globalFlag.checked){
-        return string.match(regExp)[0];
-    }
-    return "No matches"
+        //check if regex matches at least once
+        let pattern = string.match(regex);
+        if (!pattern) return "no match";
+        else if (globalFlag.checked){
+            pattern = string.matchAll(regex).toArray().map(match=>{
+                return match[0];
+            })
+            return pattern.join(", ")
+        }
+        else return pattern[0];
 }
 /*Event Listeners */
 //Button click listener to call function 3
@@ -65,6 +68,6 @@ testButton.addEventListener("click", ()=>{
     }
     else {
         //RegExp(string, flags)
-        testResult.textContent = testString(stringToTest.textContent, regExp)
+        testResult.textContent = testString(stringToTest.innerHTML, regExp);
     }
 })
