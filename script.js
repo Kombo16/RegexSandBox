@@ -39,15 +39,16 @@ and prints output
   description: Takes string and regex pattern and checks for all occurences of the regex in string
   output: returns values gotten to result.textContent else return no match
 */
+let pattern;
 function testString(string, regex){
         //check if regex matches at least once
-        let pattern = string.match(regex);
+        pattern = string.match(regex);
         if (!pattern) return "no match";
         else if (globalFlag.checked){
             pattern = string.matchAll(regex).toArray().map(match=>{
                 return match[0];
             })
-            return pattern.join(", ")
+            return pattern.join(", ");
         }
         else return pattern[0];
 }
@@ -69,5 +70,7 @@ testButton.addEventListener("click", ()=>{
     else {
         //RegExp(string, flags)
         testResult.textContent = testString(stringToTest.innerHTML, regExp);
+        stringToTest.innerHTML = stringToTest.innerHTML.replace(regExp, `<span class="highlight">$&</span>`);
+        console.log(pattern);
     }
 })
