@@ -11,8 +11,6 @@ const testResult = document.getElementById("result");
 const flagsContainer = document.getElementById("flags-container");
 const caseInsensitiveFlag = document.getElementById("i");
 const globalFlag = document.getElementById("g");
-//Variable that stores the regular expression
-let regExp;
 /*Functions */
 
 /*1. Function that updates the regex based on the flag checked by the checkbox
@@ -29,40 +27,85 @@ function getFlags(){
     }
     return "";
 }
-/*3. Function that test the input against the built regex
+/*2. Function that test the input against the built regex
 and return output
   input: value of test-string variable and function call of function 1
   description: Takes string and regex pattern and checks for all occurences of the regex in string
   output: returns values gotten to result.textContent else return no match
 */
 function testString(string, regex){
-        //check if regex matches at least once
-        let pattern = string.match(regex);
-        if (!pattern) return "no match";
-        else if (globalFlag.checked){
-            pattern = string.matchAll(regex).toArray().map(match=>{
-                return match[0];
-            })
-            return pattern.join(", ");
+    if (!regex) return "No regex pattern";
+    //check if global flag is checked
+    if (globalFlag.checked){
+        const matches = Array.from(string.matchAll(regex))
+        if (matches.length == 0) return "no match";
+        return matches.map(match=>match[0]).join(", ")
+    }
+    else {
+        const match = string.match(regex);
+        return match ? match[0] : "no match";
+    }
+}
+/*3. Function that updates the regex Pattern
+*/
+function updateRegex(){
+    let regExp;
+    try{
+        const pattern = regexPattern.value;
+        if(pattern == "") {
+            regExp = null;
+            return;
         }
-        else return pattern[0];
+        regExp = RegExp(pattern, getFlags());
+        console.log(regExp);
+    } catch (e) {
+        console.log("Invalid regex: "+e);
+        return;
+    }
 }
 /*Event Listeners */
 //regex event listeners that update the regular expression
-regexPattern.addEventListener("input",()=>{
-    regExp = RegExp(regexPattern.value, getFlags());
-})
-flagsContainer.addEventListener("change",()=>{
-    regExp = RegExp(regexPattern.value, getFlags());
-})
+regexPattern.addEventListener("input",updateRegex);
+flagsContainer.addEventListener("change",updateRegex);
 //Button click listener to call test string function
 testButton.addEventListener("click", ()=>{
-    if (stringToTest.textContent == "") {
+    //Keep original text before highlighting
+    const originalText = stringToTest.textContent;
+    if (originalText.trim() == "") {
         testResult.textContent = "Nothing to test";
+        return;
     }
     else {
-        //RegExp(string, flags)
-        testResult.textContent = testString(stringToTest.innerHTML, regExp);
-        stringToTest.innerHTML = stringToTest.innerHTML.replace(regExp, `<span class="highlight">$&</span>`);
+        let regExp;
+        try {
+            const pattern = regexPattern.value;
+            if(pattern == "") {
+                regExp = null;
+                return;
+            }   
+            regExp = RegExp(pattern, getFlags());
+            console.log(regExp);
+        } catch (e) {
+            console.log("Invalid regex: "+e);
+            testResult.textContent = "Invalid or empty regex pattern";
+            return;
+        }
+        try{
+            const result = testString(stringToTest.textContent, regExp);
+            testResult.textContent = result;
+
+            if (result !== "no match" && result !== "Invalid or empty regex pattern") {
+                const highlightRegex = new RegExp(regExp.source, getFlags());
+                const safe = originalText.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+                stringToTest.innerHTML = safe.replace(highlightRegex, `<span class="highlight">$&</span>`);
+            }
+            else{
+                stringToTest.innerHTML = originalText;
+            }
+        }
+        catch (e){
+            testResult.textContent = "Error testing regex"+e.message;
+            console.error(e);
+        }
     }
 })
